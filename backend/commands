@@ -1,0 +1,58 @@
+# List all commands to resolve kubeconfig error in Jenkins
+
+# View and set permissions for kubeconfig
+ls ~/.kube/config
+chmod 600 ~/.kube/config
+sudo chown jenkins:jenkins ~/.kube/config
+kubectl get pods
+
+# Check network configuration
+ifconfig
+
+# SSH setup
+sudo apt update
+sudo apt install openssh-server
+sudo systemctl start ssh
+ssh charansrisai@localhost
+
+# Permissions for kubeconfig
+ls -l ~/.kube/config
+chmod 600 ~/.kube/config
+ls -l ~/.kube/config
+kubectl get pods -n mern-app
+
+# Manage Jenkins kubeconfig directory
+cd /var/lib/jenkins
+ls -l
+ls -l /var/lib/jenkins/.kube
+sudo mkdir -p /var/lib/jenkins/.kube
+sudo cp /home/charansrisai/.kube/config /var/lib/jenkins/.kube/config
+sudo chown -R jenkins:jenkins /var/lib/jenkins/.kube
+sudo chmod 600 /var/lib/jenkins/.kube/config
+ls -l /var/lib/jenkins/.kube/config
+sudo systemctl restart jenkins
+
+sudo chown -R jenkins:jenkins /home/charansrisai/.minikube
+sudo chmod -R 755 /home/charansrisai/.minikube
+
+sudo chmod 644 /home/charansrisai/.minikube/profiles/minikube/*.crt
+sudo chmod 644 /home/charansrisai/.minikube/profiles/minikube/*.key
+sudo chown -R jenkins:jenkins /home/charansrisai/.minikube/profiles/minikube/
+
+# Verify Minikube certificate
+ls -l /home/charansrisai/.minikube/ca.crt
+sudo chown -R jenkins:jenkins /home/charansrisai/.minikube
+sudo chmod -R 755 /home/charansrisai/.minikube
+sudo chmod 755 /home/charansrisai
+sudo chmod 755 /home/charansrisai/.minikube
+
+# Export KUBECONFIG
+export KUBECONFIG=/home/charansrisai/.kube/config
+echo 'export KUBECONFIG=/home/charansrisai/.kube/config' >> ~/.bashrc
+source ~/.bashrc
+kubectl config view
+
+# Test commands for pods
+sudo -i -u jenkins kubectl get pods -n mern-app
+exit
+

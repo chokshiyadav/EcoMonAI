@@ -1,0 +1,13 @@
+FROM node:16-alpine
+WORKDIR /
+
+RUN apk add --no-cache python3 make g++ gcc
+COPY package*.json ./
+RUN rm -rf node_modules package-lock.json
+RUN npm install
+RUN npm rebuild bcrypt --build-from-source
+COPY . .
+RUN mkdir -p /logs && chmod -R 777 /logs
+EXPOSE 3001
+ENV NODE_OPTIONS="--max-old-space-size=4196"
+CMD ["npm", "start", "--max-old-space-size=4096"]
