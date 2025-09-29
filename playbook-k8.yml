@@ -1,0 +1,188 @@
+---
+- name: Deploying with Kubernetes
+  hosts: ansible_nodes
+  become: yes
+  gather_facts: no
+  tasks:
+
+    - name: Install pre-requisites
+      pip:
+        name:
+          - openshift
+          - pyyaml
+          - kubernetes 
+
+    - name: Create Namespace for MERN App
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: mern-app
+    
+    - name: Apply Secrets
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', './k8/mern-backend-secret.yaml') | from_yaml }}"
+
+    - name: Create Config Map
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', './k8/frontend-configmap.yaml') | from_yaml }}" 
+
+    - name: Create Frontend Deployment
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', './k8/frontend-deployment.yaml') | from_yaml }}"
+      args:
+        force: yes
+
+    - name: Create Frontend Service
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', './k8/frontend-service.yaml') | from_yaml }}"
+
+    - name: Create Backend Deployment
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', './k8/backend-deployment.yaml') | from_yaml }}"
+      args:
+        force: yes
+
+    - name: Create Backend Service
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', './k8/backend-service.yaml') | from_yaml }}"
+
+    - name: Create Backend ServiceMonitor
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', './k8/backend-servicemonitor.yaml') | from_yaml }}"
+
+    - name: Create Ingress
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', './k8/mern-ingress.yaml') | from_yaml }}"
+    
+    - name: Create Backend HPA
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', './k8/backend-hpa.yaml') | from_yaml }}"
+
+    - name: Create Frontend HPA
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', './k8/frontend-hpa.yaml') | from_yaml }}"
+
+    - name: Ensure Frontend Deployment uses the latest image
+      kubernetes.core.k8s:
+        state: patched
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: frontend-deployment
+            namespace: mern-app
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: frontend
+                    imagePullPolicy: Always
+
+    - name: Ensure Backend Deployment uses the latest image
+      kubernetes.core.k8s:
+        state: patched
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: backend-deployment
+            namespace: mern-app
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: backend
+                    imagePullPolicy: Always
+
+    - name: Verify Frontend Deployment is running
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: Deployment
+        name: frontend-deployment
+        namespace: mern-app
+      register: frontend_deployment_status
+
+    - name: Debug Frontend Deployment Status
+      debug:
+        var: frontend_deployment_status.resources[0].status
+
+    - name: Verify Backend Deployment is running
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: Deployment
+        name: backend-deployment
+        namespace: mern-app
+      register: backend_deployment_status
+
+    - name: Debug Backend Deployment Status
+      debug:
+        var: backend_deployment_status.resources[0].status
+
+
+    # -------------------------
+    # ✅ Kafka + Zookeeper Setup
+    # -------------------------
+
+    - name: Create Namespace for Kafka
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: kafka
+
+    - name: Deploy Kafka using Helm
+      command: >
+        helm install kafka bitnami/kafka
+        --namespace kafka
+        --set replicaCount=1
+        --set zookeeper.replicaCount=1
+        --set listeners.client.protocol=PLAINTEXT
+        --set listeners.controller.protocol=PLAINTEXT
+        --set metrics.jmx.enabled=true
+        --set metrics.kafka.enabled=true
+      args:
+        creates: /tmp/kafka_installed
+
+    - name: Mark Kafka installed
+      file:
+        path: /tmp/kafka_installed
+        state: touch
+
+
+    # -------------------------
+    # ✅ Prometheus → Kafka Producer Setup
+    # -------------------------
+
+    - name: Deploy Prometheus Producer Deployment
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', './k8/prometheus-producer-deployment.yaml') | from_yaml }}"
+      args:
+        force: yes
+
+    - name: Verify Prometheus Producer Deployment is running
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: Deployment
+        name: prometheus-producer
+        namespace: mern-app
+      register: producer_status
+
+    - name: Debug Prometheus Producer Deployment Status
+      debug:
+        var: producer_status.resources[0].status

@@ -1,0 +1,11 @@
+{
+    "timestamp": "2024-12-09T19:57:39Z",
+    "level": "INFO",
+    "message": "Fetching event by title",
+    "service": "your-service-name",
+    "context": {
+      "additionalKey1": "value1",
+      "additionalKey2": "value2"
+    }
+  }
+  
