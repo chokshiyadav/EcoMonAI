@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-producer
+  namespace: mern-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-producer
+  template:
+    metadata:
+      labels:
+        app: prometheus-producer
+    spec:
+      containers:
+      - name: prometheus-producer
+        image: chokshi/prometheus-producer:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            cpu: 250m
+            memory: 128Mi

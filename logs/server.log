@@ -1,0 +1,33 @@
+[2024-12-09 19:48:57] [INFO] Fetching all events
+[2024-12-09 19:48:57] [INFO] Successfully fetched all events
+[2024-12-09 19:48:58] [INFO] Fetching event by title
+[2024-12-09 19:48:58] [INFO] Successfully fetched event
+[2024-12-09 19:49:10] [INFO] Participation request
+[2024-12-09 19:49:10] [INFO] User registered for event successfully
+[2024-12-09 19:50:54] [INFO] Fetching all events
+[2024-12-09 19:50:54] [INFO] Successfully fetched all events
+[2024-12-09 19:50:55] [INFO] Fetching event by title
+[2024-12-09 19:50:55] [INFO] Successfully fetched event
+[2024-12-09 19:51:15] [INFO] Participation request
+[2024-12-09 19:51:15] [INFO] User already registered for event
+[2024-12-09 19:51:22] [INFO] Fetching participated events
+[2024-12-09 19:51:22] [INFO] Fetched participated events successfully
+[2024-12-09 19:51:28] [INFO] Removing event from user
+[2024-12-09 19:51:28] [WARN] Event not found while trying to remove from user
+[2024-12-09 19:51:33] [INFO] Removing event from user
+[2024-12-09 19:51:33] [WARN] Event not found while trying to remove from user
+[2024-12-09 19:51:35] [INFO] Removing event from user
+[2024-12-09 19:51:35] [WARN] Event not found while trying to remove from user
+[2024-12-09 19:51:46] [INFO] Fetching all events
+[2024-12-09 19:51:46] [INFO] Successfully fetched all events
+[2024-12-09 19:51:50] [INFO] Fetching participated events
+[2024-12-09 19:51:50] [INFO] Fetched participated events successfully
+[2024-12-09 19:51:52] [INFO] Removing event from user
+[2024-12-09 19:51:52] [INFO] Event removed from user successfully
+[2024-12-09 19:51:52] [INFO] Fetching participated events
+[2024-12-09 19:51:52] [INFO] Fetched participated events successfully
+[2024-12-09 19:52:41] [INFO] Event created successfully
+[2024-12-09 19:52:43] [INFO] Fetching hosted events for user
+[2024-12-09 19:52:43] [INFO] Successfully fetched hosted events
+[2024-12-09 19:52:45] [INFO] Fetching users for event
+[2024-12-09 19:52:45] [INFO] Successfully fetched users for event
